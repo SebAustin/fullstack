@@ -18,7 +18,7 @@ jobs:
           name: Install Frontend Dependencies
           command: |
             cd udagram/udagram-frontend
-            npm install
+            npm install --legacy-peer-deps
       - run:
           name: Build Frontend
           command: |
@@ -33,7 +33,7 @@ jobs:
           name: Install Backend Dependencies
           command: |
             cd udagram/udagram-api
-            npm install
+            npm install --legacy-peer-deps
       - run:
           name: Build Backend
           command: |
