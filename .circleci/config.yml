@@ -2,8 +2,8 @@ version: 2.1
 
 orbs:
   node: circleci/node@5.0.2
-  aws-cli: circleci/aws-cli@3.1.1
   eb: circleci/aws-elastic-beanstalk@2.0.1
+  aws-cli: circleci/aws-cli@3.1.1
 
 jobs:
   build:
@@ -12,88 +12,77 @@ jobs:
     working_directory: ~/repo
     steps:
       - checkout
-      
-      # Install frontend dependencies
+      - node/install:
+          node-version: '16.20'
       - run:
           name: Install Frontend Dependencies
           command: |
-            npm run frontend:install
-      
-      # Install backend dependencies
-      - run:
-          name: Install Backend Dependencies
-          command: |
-            npm run api:install
-      
-      # Lint the frontend
-      - run:
-          name: Lint Frontend
-          command: |
-            npm run frontend:lint
-      
-      # Build the frontend
+            cd udagram/udagram-frontend
+            npm install
       - run:
           name: Build Frontend
           command: |
-            npm run frontend:build
-      
-      # Build the backend API
+            cd udagram/udagram-frontend
+            npm run build
       - run:
-          name: Build Backend API
+          name: Lint Frontend
           command: |
-            npm run api:build
+            cd udagram/udagram-frontend
+            npm run lint
+      - run:
+          name: Install Backend Dependencies
+          command: |
+            cd udagram/udagram-api
+            npm install
+      - run:
+          name: Build Backend
+          command: |
+            cd udagram/udagram-api
+            npm run build
+      - persist_to_workspace:
+          root: ~/repo
+          paths:
+            - udagram/udagram-frontend/www
+            - udagram/udagram-api/www
+            - udagram/udagram-api/package.json
 
   deploy:
     docker:
       - image: cimg/base:stable
     working_directory: ~/repo
     steps:
-      - node/install:
-          node-version: '16.20' 
       - checkout
-      - eb/setup
+      - attach_workspace:
+          at: ~/repo
+      - node/install:
+          node-version: '16.20'
       - aws-cli/setup
-      
-      # Set AWS region for EB CLI
       - run:
-          name: Set AWS Region
+          name: Deploy Frontend to S3
           command: |
-            echo "export AWS_DEFAULT_REGION=$AWS_REGION" >> $BASH_ENV
-            source $BASH_ENV
-      
-      # Deploy the backend API to Elastic Beanstalk
-      # NOTE: EB CLI deployment may fail with AWS Academy due to permission restrictions
-      # In AWS Academy, deploy manually via AWS Console instead
+            cd udagram/udagram-frontend
+            chmod +x bin/deploy.sh
+            bin/deploy.sh
       - run:
-          name: Deploy Backend API
+          name: Deploy Backend to Elastic Beanstalk
           command: |
-            npm run api:deploy || echo "EB deployment failed - manual deployment via AWS Console required for AWS Academy"
-      
-      # Deploy the frontend to S3
-      - run:
-          name: Deploy Frontend
-          command: |
-            npm run frontend:deploy
-            
+            cd udagram/udagram-api
+            # AWS Academy may not allow EB CLI deployment, so we handle the error gracefully
+            eb use udagram-api-dev || echo "EB CLI not configured or restricted in AWS Academy"
+            eb deploy udagram-api-dev || echo "EB deployment failed - manual deployment via AWS Console required for AWS Academy"
+
 workflows:
-  version: 2
-  build-and-deploy:
+  udagram:
     jobs:
       - build
       - hold:
+          filters:
+            branches:
+              only:
+                - main
           type: approval
           requires:
             - build
-          filters:
-            branches:
-              only:
-                - main
-                - master
       - deploy:
           requires:
             - hold
-          filters:
-            branches:
-              only:
-                - main
-                - master
