@@ -1,6 +1,6 @@
 # Udagram - Hosting a Full-Stack Application
 
-[![CircleCI](https://circleci.com/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME.svg?style=svg)](https://circleci.com/gh/YOUR_GITHUB_USERNAME/YOUR_REPO_NAME)
+[![CircleCI](https://circleci.com/gh/SebAustin/fullstack.svg?style=svg)](https://circleci.com/gh/SebAustin/fullstack)
 
 ## Project Overview
 
@@ -8,11 +8,9 @@ Udagram is an Instagram-inspired image filtering application that allows users t
 
 ### Live Application
 
-**Frontend URL**: http://your-s3-bucket-name.s3-website-us-east-1.amazonaws.com
+**Frontend URL**: http://udagram-frontend-d5acd6ba.s3-website-us-east-1.amazonaws.com
 
-**Backend API**: http://udagram-api-dev.eba-xxxxx.us-east-1.elasticbeanstalk.com/api/v0
-
-> **Note**: Replace the URLs above with your actual deployed application URLs after completing the AWS setup.
+**Backend API**: http://udagram-api-dev.eba-t7kwpbwm.us-east-1.elasticbeanstalk.com/api/v0
 
 ## Application Architecture
 
@@ -81,7 +79,13 @@ Comprehensive documentation is available in the `docs/` folder:
 - **[Infrastructure Description](docs/Infrastructure_description.md)**: Details about AWS services, architecture diagrams, and resource specifications
 - **[Pipeline Description](docs/Pipeline_description.md)**: CI/CD pipeline workflow, stages, and deployment process
 - **[Application Dependencies](docs/Application_dependencies.md)**: Complete list of all dependencies and their purposes
+- **[Architecture & Pipeline Diagrams](docs/DIAGRAMS.md)**: Visual diagrams showing infrastructure and CI/CD flow
 - **[AWS Setup Guide](docs/AWS_setup_guide.md)**: Step-by-step instructions for setting up AWS resources
+
+### Submission Guides
+
+- **[Screenshot Guide](SCREENSHOT_GUIDE.md)**: Detailed instructions for taking all required screenshots
+- **[Submission Checklist](SUBMISSION_CHECKLIST.md)**: Complete checklist to verify project meets all requirements
 
 ## Prerequisites
 
