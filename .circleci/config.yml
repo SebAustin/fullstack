@@ -1,0 +1,99 @@
+version: 2.1
+
+orbs:
+  node: circleci/node@5.0.2
+  aws-cli: circleci/aws-cli@3.1.1
+  eb: circleci/aws-elastic-beanstalk@2.0.1
+
+jobs:
+  build:
+    docker:
+      - image: cimg/node:16.20
+    working_directory: ~/repo
+    steps:
+      - checkout
+      
+      # Install frontend dependencies
+      - run:
+          name: Install Frontend Dependencies
+          command: |
+            npm run frontend:install
+      
+      # Install backend dependencies
+      - run:
+          name: Install Backend Dependencies
+          command: |
+            npm run api:install
+      
+      # Lint the frontend
+      - run:
+          name: Lint Frontend
+          command: |
+            npm run frontend:lint
+      
+      # Build the frontend
+      - run:
+          name: Build Frontend
+          command: |
+            npm run frontend:build
+      
+      # Build the backend API
+      - run:
+          name: Build Backend API
+          command: |
+            npm run api:build
+
+  deploy:
+    docker:
+      - image: cimg/base:stable
+    working_directory: ~/repo
+    steps:
+      - node/install:
+          node-version: '16.20' 
+      - checkout
+      - eb/setup
+      - aws-cli/setup
+      
+      # Set AWS region for EB CLI
+      - run:
+          name: Set AWS Region
+          command: |
+            echo "export AWS_DEFAULT_REGION=$AWS_REGION" >> $BASH_ENV
+            source $BASH_ENV
+      
+      # Deploy the backend API to Elastic Beanstalk
+      # NOTE: EB CLI deployment may fail with AWS Academy due to permission restrictions
+      # In AWS Academy, deploy manually via AWS Console instead
+      - run:
+          name: Deploy Backend API
+          command: |
+            npm run api:deploy || echo "EB deployment failed - manual deployment via AWS Console required for AWS Academy"
+      
+      # Deploy the frontend to S3
+      - run:
+          name: Deploy Frontend
+          command: |
+            npm run frontend:deploy
+            
+workflows:
+  version: 2
+  build-and-deploy:
+    jobs:
+      - build
+      - hold:
+          type: approval
+          requires:
+            - build
+          filters:
+            branches:
+              only:
+                - main
+                - master
+      - deploy:
+          requires:
+            - hold
+          filters:
+            branches:
+              only:
+                - main
+                - master
