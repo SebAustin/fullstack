@@ -1,0 +1,34 @@
+# Terraform Variables Configuration
+# Copy this file to terraform.tfvars and update with your values
+
+# AWS Configuration
+aws_region   = "us-east-1"
+project_name = "udagram"
+environment  = "dev"
+
+# Database Configuration
+db_name     = "postgres"
+db_username = "postgres"
+db_password = "YourSecurePassword123!"  # CHANGE THIS! Use a strong password
+
+# Database Instance Configuration (Free Tier)
+db_instance_class    = "db.t3.micro"
+db_allocated_storage = 20
+
+# PostgreSQL Version  
+postgres_engine_version = "14.15"
+
+# S3 Configuration
+enable_s3_versioning = false
+
+# IAM Configuration
+# Set to false for AWS Academy (use your session credentials instead)
+# Set to true for personal AWS accounts
+create_iam_user = false
+
+# Additional Tags (optional)
+additional_tags = {
+  Owner      = "Your Name"
+  CostCenter = "Education"
+}
+
